@@ -1,1 +1,78 @@
 hola conmpañeros
+public class Saludar {
+public static void main (String args[]){
+   System.out.println("hola visitante");
+   }
+ }
+ package SemaforComputarizado;
+
+public class SimuladorSemaforo implements Runnable {
+private Thread subpr;
+ColorSemaforo cs;
+boolean alto = false;
+
+SimuladorSemaforo(ColorSemaforo init){
+	cs = init;
+	subpr = new Thread(this);
+	subpr.start();
+}
+
+SimuladorSemaforo(){
+	cs = ColorSemaforo.ROJO;
+	
+	subpr = new Thread(this);
+	subpr.start();
+}
+
+//Inicia la luz
+public void run(){
+	while(!alto){
+		try{
+			switch(cs){
+			case VERDE:
+				Thread.sleep(10000); //espera 10 swgundos
+				break;
+			case AMARILLO:
+				Thread.sleep(2000); //espera 2 segundos
+				break;
+			case ROJO:
+				Thread.sleep(12000); //espera 12 segundos
+				break;
+			}
+		}
+		catch(InterruptedException e){
+			System.out.println(e);
+		}
+		cambiarColor();
+	}
+}
+public synchronized void cambiarColor(){
+	switch(cs){
+	case ROJO:
+		cs = ColorSemaforo.VERDE;
+		break;
+	case AMARILLO:
+		cs = ColorSemaforo.ROJO;
+		break;
+	case VERDE:
+		cs = ColorSemaforo.AMARILLO;
+	}
+	notify(); // indica que ha cambiado al luz
+}
+public synchronized void esperarCambio(){
+  try{
+	  wait(); // espera cambio de la luz
+  }
+  catch(InterruptedException exc){
+	  System.out.println(exc);
+  }
+}
+  //Regresa el color real
+  ColorSemaforo obtenerColor(){
+	  return cs;
+  }
+  //Detiene el cemaforo
+  void cancel(){
+	  alto = true;
+  }
+}
